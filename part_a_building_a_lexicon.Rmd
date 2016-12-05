@@ -1,0 +1,169 @@
+---
+title: "Part A: Building A Racial Lexicon"
+author: "Nettles"
+date: "November 20, 2016"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Outline:
+Intro:
+- discussion of non-binary understanding of whitness in real practice; racial ordering; theoretical construct of racial ordering (the framework I will attempt to recreate)
+- description of data source
+Part A: creation of racial lexicons (and religious)
+Part B: measurement of racial identity
+Part C: chronological measurement to test assertions about fluidity
+Part D: reapplicability testing against second corpus 
+  
+<p><b>Part A: Building a Lexicon of Racial Terms:</b></p>
+<p>The corpus for this trial is a set of 123 medical jurisprudence texts extracted from the MoML. These .txt files were read in R and processed using the wordVectors package to create a word embedded model (WEM). [FN - Schmidt] Word embedded models measure spatial relationships between words, which enables examination of these relationships on the basis of their nearness (similarity) or distance (less similarity.)</p>
+<p>An advantage of a WEM is that the analyst does not have to rely on a trial and error process of keyword searches to identify a set of related terms. Keyword searches are at risk of being incomplete, inaccurate because of changes in usage, or biases by contemporary sensibilities. In the WEM, the terms are suggested by spatial relationships between the words themselves.By iteratively modeling terms "nearest_to" a set of general "seed" labels ("race", "races", "racial"), an inclusive list of overall racial terms was created. This set was used to build the seed terms for individual racial groups and further modeling. As new terms were identified for a specific group, they were added back into the overall racial terms list. </p>
+
+<p>The modeling process required some decisions about inclusion of certain types of words. When modeling racial terms, the model quickly begins to include religion and geographic locations. For example, "Jew" refers to both race and religion; I included it in the list because the Jewish people are often treated as a race during this period. More generic terms, such as "ethnic" are included because they typically refer to people viewed as "other." Geographic terms were excluded if they could not also apply to a group of people, i.e., "germany" was excuded, "germanic" was included.</p>
+
+Once the term sets were identified, they were modeled to identify the 150 words closest to that vector set.
+
+
+```{r libraries, include=FALSE}
+#Kim's base library
+#library(textmineR)
+library(dplyr)
+#library(lubridate)
+#library(stringr)
+#library(tokenizers)
+#library(text2vec)
+#library(readr)
+library(Matrix)
+#library(broom)
+#library(tidyr)
+#library(ggplot2)
+library(wordVectors)
+library(tsne)
+library(stringr)
+library(tibble)
+
+
+```
+
+```{r read in vectors to model, include=FALSE}
+model = read.vectors("C:/Users/Kim/Documents/Text Analysis for Historians/moml/mjp_doc_vectors.bin")
+```
+The collective list of racial terms for medical jurisprudence are:
+```{r model for all races, include=FALSE}
+all_race_terms <- c("race", "races" , "racial" ,
+"ethnic" , "caucasian" , "esquimaux","australoid" ,  "australians", "negroid" , "mongolians" , "aboriginal","european" , "europeans" , "eskimo" , "mongolian" , "malays" , "mohammedans" , "chaldaic" , "mulattoes" , "negro" , "negress" , "japanese" , "african" , "italians" , "africans" , "jews", "tribes" , "hottentots" , "asiatics",   "mexican" , "chaco" , "hebrew" , "chinese" , "islanders" , "hindoos" , "germanic" , "scandinavian" , "arab" , "egyptian" , "persian" , "greeks" , "saxons", "indians", "anglo" , "canaanites" , "norweigan" , "peruvian" , "peruvians" , "oriental" , "georgian" , "scandinavian" , "creole", "jewish", "georgian" , "scandinavian", "roman", "romans" ,  "carthagenians", "swedes", "grecians")
+
+some_races = model %>%
+  nearest_to(model[[all_race_terms]],150) %>% names
+```
+
+```{r, echo=FALSE}
+list(all_race_terms)
+```
+Next, I created models of terms for specific racial groups so that they can be compared. Bearing in mind that these term sets are a reflection of what the texts themselves have to say about racial relationships, it is worth taking a look at the results. 
+
+```{r creating the Asian variable, include=FALSE}
+asian_terms <- c( "esquimaux","australoid" ,  "australians", "mongolians" , "aboriginal","eskimo" , "anthropoid" ,  "australians" , "mongolian" , "malays" , "mohammedans" , "chaldaic" , "japanese" , "jews", "tribes" , "asiatics", "hebrew" , "chinese" , "islanders" , "hindoos" , "indians", "oriental")
+
+races_asian = nearest_to(model,model[[ asian_terms ]],150)
+
+```
+
+
+```{r creating afram variable, include=FALSE}
+
+afram_terms <- c("negroid" , "mulattoes" , "americans" , "breeds" ,  "negro" , "negress" , "negroid" ,"african" ,  "africans" , "hottentots" , "creole" , "mongolians" )
+
+races_afram = nearest_to(model,model[[afram_terms]],150)
+
+```
+
+```{r creating white variable, include=FALSE}
+white_terms <- c("caucasian",  "germanic" , "scandinavian" , "saxons", "anglo")
+
+races_white = nearest_to(model,model[[white_terms]],150)
+
+```
+
+```{r creating hispanic variable, include=FALSE}
+hispanic_terms <-c("mexican" , "aboriginal" , "chaco" , "peruvian" , "peruvians" , "indians" , "spanish")
+
+races_hispanic = nearest_to(model,model[[hispanic_terms]],300)
+```
+
+```{r creating european variable, include=FALSE}
+european_terms<- c("european" , "europeans" , "italians" ,  "germanic" , "scandinavian" ,  "greeks" , "saxons",  "anglo" ,  "norweigan" , "georgian" , "scandinavian", "roman", "romans" ,  "carthagenians", "swedes", "grecians")
+
+races_european = nearest_to(model,model[[european_terms]],150)
+```
+Asian terms: 
+```{r, echo=FALSE}
+list(asian_terms)
+```
+
+
+African American terms:
+```{r, echo=FALSE}
+list(afram_terms)
+```
+
+European terms:
+```{r, echo=FALSE}
+list(european_terms)
+```
+Hispanic terms:
+```{r, echo=FALSE}
+list(hispanic_terms)
+```
+White terms:
+```{r, echo=FALSE}
+list(white_terms)
+
+```
+
+```{r, creating jewish variable, include=FALSE}
+jewish_terms <- c("jews", "tribes" , "hebrew" ,"jewish", "chaldaic")
+races_jewish = nearest_to(model,model[[jewish_terms]],300)
+```
+Jewish terms:
+```{r, echo=FALSE}
+list(jewish_terms)
+```
+
+Since Jewishness is also a religious identity, I created Christian and Muslim lexicons. 
+
+```{r christian variable, include=FALSE}
+#seed terms christian/christians.
+christian_terms <-c("christian", "christians", "catholic", "episcopal", "protestant", "roman", "priests")
+
+races_christian = nearest_to(model,model[[christian_terms]],150)
+```
+Christian terms:
+```{r, echo=FALSE}
+list(christian_terms)
+```
+
+```{r creating muslim variable, include=FALSE}
+
+muslim_terms <-c("mohammedans")
+
+races_muslim = nearest_to(model,model[[muslim_terms]],150)
+```
+Muslim terms:
+```{r, echo=FALSE}
+list(muslim_terms)
+```
+<p>Where are the Irish?</>
+<p>The term "irish" did not arise during any of the modeling.  This is surprising, given their large scale immigration to the United States during this period and their history as "less white" than other groups.  A model of the term explains why: "irish" appears in the texts, but not in significant relation to other racial terms.
+```{r looking for the Irish}
+irish_terms <- c("irish"  )
+
+races_irish = nearest_to(model,model[[irish_terms]],150)
+
+head(races_irish, 20)
+
+```
+In a similar vein, Native Americans do not appear in the texts. Modeling of "indian" and "tribes" indicates that the relationships refer to India and Asian topics. The names of selected Native American tribes yielded null values.
