@@ -1,5 +1,5 @@
 ---
-title: "Part A: Building A Racial Lexicon"
+title: "Part A & B: Building A Racial Lexicon & Measuring Whiteness"
 author: "Nettles"
 date: "November 20, 2016"
 output:
@@ -50,6 +50,7 @@ library(tibble)
 
 ```{r read in vectors to model, include=FALSE}
 model = read.vectors("C:/Users/Kim/Documents/Text Analysis for Historians/moml/mjp_doc_vectors.bin")
+
 ```
 The collective list of racial terms for medical jurisprudence are:
 ```{r model for all races, include=FALSE}
@@ -58,12 +59,20 @@ all_race_terms <- c("race", "races" , "racial" ,
 
 some_races = model %>%
   nearest_to(model[[all_race_terms]],150) %>% names
+saveRDS(some_races, "some_races.RDS")
+
+races_all = nearest_to(model,model[[ all_race_terms ]],150)
 ```
 
 ```{r, echo=FALSE}
 list(all_race_terms)
 ```
-Next, I created models of terms for specific racial groups so that they can be compared. Bearing in mind that these term sets are a reflection of what the texts themselves have to say about racial relationships, it is worth taking a look at the results. 
+<p>Next, I created models of terms for specific racial groups so that they can be compared. Bearing in mind that these term sets are a reflection of what the texts themselves have to say about racial relationships, it is worth taking a look at the results. </p>
+<p> "Whiteness" appears to be determined more by why it <i>is not</i> than by what it <i>is</i>. Twenty-two terms define Asians, including references to Jews, Muslims, and Hindus. Twelve terms define "blackness." "Whiteness," on the other hand, is defined by just four terms. Europeans are defined by their points of origin; a more precise rendering of them as a racial category would probably include a division between southern and eastern Europeans versus anglo-saxon countries.</p>
+
+<p>The nomenclature for the "blackness" lexicon was chosen over "African American" because the included terms did not necessarily refer to U.S. citizens. Of the available choices, "black" aligns with the terms used by other texts on the subject.
+
+
 
 ```{r creating the Asian variable, include=FALSE}
 asian_terms <- c( "esquimaux","australoid" ,  "australians", "mongolians" , "aboriginal","eskimo" , "anthropoid" ,  "australians" , "mongolian" , "malays" , "mohammedans" , "chaldaic" , "japanese" , "jews", "tribes" , "asiatics", "hebrew" , "chinese" , "islanders" , "hindoos" , "indians", "oriental")
@@ -75,9 +84,9 @@ races_asian = nearest_to(model,model[[ asian_terms ]],150)
 
 ```{r creating afram variable, include=FALSE}
 
-afram_terms <- c("negroid" , "mulattoes" , "americans" , "breeds" ,  "negro" , "negress" , "negroid" ,"african" ,  "africans" , "hottentots" , "creole" , "mongolians" )
+black_terms <- c("negroid" , "mulattoes" , "breeds" ,  "negro" , "negress" , "negroid" ,"african" ,  "africans" , "hottentots" , "creole" , "mongolians" )
 
-races_afram = nearest_to(model,model[[afram_terms]],150)
+races_black = nearest_to(model,model[[black_terms]],150)
 
 ```
 
@@ -91,7 +100,7 @@ races_white = nearest_to(model,model[[white_terms]],150)
 ```{r creating hispanic variable, include=FALSE}
 hispanic_terms <-c("mexican" , "aboriginal" , "chaco" , "peruvian" , "peruvians" , "indians" , "spanish")
 
-races_hispanic = nearest_to(model,model[[hispanic_terms]],300)
+races_hispanic = nearest_to(model,model[[hispanic_terms]],150)
 ```
 
 ```{r creating european variable, include=FALSE}
@@ -107,7 +116,7 @@ list(asian_terms)
 
 African American terms:
 ```{r, echo=FALSE}
-list(afram_terms)
+list(black_terms)
 ```
 
 European terms:
@@ -146,7 +155,7 @@ Christian terms:
 list(christian_terms)
 ```
 
-```{r creating muslim variable, include=FALSE}
+```{r creating muslim variable, echo=FALSE}
 
 muslim_terms <-c("mohammedans")
 
@@ -154,8 +163,28 @@ races_muslim = nearest_to(model,model[[muslim_terms]],150)
 ```
 Muslim terms:
 ```{r, echo=FALSE}
-list(muslim_terms)
+
 ```
+
+```{r creating the insider variable, echo=FALSE}
+insider_terms = model[[c("gentleman" , "lady" , "clergyman" , "nobleman" , "englishman" , "tradesman", "innkeeper", "pensioner", "governess", "respectable", "unimpeachable", "pastor", "preacher")]]
+
+
+insider_terms <-model %>% nearest_to(insider_terms)
+races_insider = nearest_to(model,model[[names(insider_terms)]],150)
+
+
+```
+
+```{r creating the outsider, include=TRUE}
+outsider_terms = model[[c("suspect" , "criminal" , "prostitute" , "perpetrator" ,"liar", "accomplice", "accomplices", "culprit" , "accused" , "offender")]]
+
+model %>% nearest_to(outsider_terms)
+outsider_terms <-model %>% nearest_to(outsider_terms)
+races_outsider = nearest_to(model,model[[names(outsider_terms)]],150)
+
+```
+
 <p>Where are the Irish?</>
 <p>The term "irish" did not arise during any of the modeling.  This is surprising, given their large scale immigration to the United States during this period and their history as "less white" than other groups.  A model of the term explains why: "irish" appears in the texts, but not in significant relation to other racial terms.
 ```{r looking for the Irish}
@@ -167,3 +196,139 @@ head(races_irish, 20)
 
 ```
 In a similar vein, Native Americans do not appear in the texts. Modeling of "indian" and "tribes" indicates that the relationships refer to India and Asian topics. The names of selected Native American tribes yielded null values.
+
+<p><b>Measuring Whiteness</b></p>
+<p>Having established the terms used within the text to define racial identities, the next step is to examine the assertion that while race may be binary in theory, in practice it operates along a continuum. (several examples of this; do comparisons illustrate position change based upon which groups are being compared?  Instead of a linear relationship, identity triangulates in realtion to all others.  Move on to Kim's depiction and then do the meat/veg example.)
+
+```{r Cosine Similarity Scores, echo=FALSE}
+#1. Create races model
+races = model[rownames(model) %in% some_races [1:75], ]
+#2. African American Cosine Similarity Score
+black_score = races %>% cosineSimilarity(model[[names(races_black)]])
+#3. Asian Cosine Similarity Score
+asian_score = races %>% cosineSimilarity(model[[names(races_asian)]])
+#4. Caucasian Cosine Similarity Score
+caucasian_score = races %>% cosineSimilarity(model[[names(races_white)]])
+#5. Hispanic Cosine Similarity Score
+hispanic_score = races %>% cosineSimilarity(model[[names(races_hispanic)]])
+#6. European Cosine Similarity Score
+european_score = races %>% cosineSimilarity(model[[names(races_european)]])
+#7. Jewish Cosine Similarity Score
+jewish_score = races %>% cosineSimilarity(model[[names(races_jewish)]])
+#8. Christian Cosine Similarity Score
+christian_score = races %>% cosineSimilarity(model[[names(races_christian)]])
+#9. Muslim Cosine Similarity Score
+muslim_score = races %>% cosineSimilarity(model[[names(races_muslim)]])
+#10. All races
+all_races_score = races %>% cosineSimilarity(model[[names(races_all)]])
+#11. Insider Cosine Similarity Score
+insider_score = races %>% cosineSimilarity(model[[names(races_insider)]])
+#12. Outsider Cosine Similarity Score
+outsider_score = races %>% cosineSimilarity(model[[names(races_outsider)]])
+
+```
+
+```{R Plotting Cosine Similarities, include=TRUE}
+
+#1. White vs Black
+png(filename="black_vs_white_cosineimilarities.png")
+plot(black_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to Black\n(x axis) and White (y axis).")
+text(black_score, caucasian_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+dev.off()
+
+
+#2.Asian vs Black 
+png(filename="asian_vs_black_cosineimilarities.png")
+plot(black_score, asian_score, type ='n', main="Top 150 words plotted by their similarity to AA\n(x axis) and Asians (y axis).")
+text(black_score, asian_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+dev.off()
+
+#3. Caucasian vs Asian
+plot(asian_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to Asian\n(x axis) and Caucasians (y axis).")
+text(asian_score, caucasian_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+
+#4. Caucasian vs Jewish
+plot(jewish_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to Jewish\n(x axis) and Caucasians (y axis).")
+text(jewish_score, caucasian_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+
+#5. All Races vs Caucasian
+plot(all_races_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to All Races\n(x axis) and Caucasians (y axis).")
+text(all_races_score, caucasian_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+
+
+#6. Caucasian vs European
+plot(european_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to european\n(x axis) and Caucasians (y axis).")
+text(all_races_score, caucasian_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+
+#7. Insider vs Outsider
+plot(insider_score, outsider_score, type ='n', main="Top 150 words plotted by their similarity to insider\n(x axis) and outsider (y axis).")
+text(insider_score, outsider_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+
+
+```
+This is a comparison of the four racial groups in terms of their nearness to one another:
+```{r creating comparative vectors, include=FALSE}
+
+all_races = data.frame(word = rownames(races))
+
+#White vs black vector
+white_black_vector = model[[(names(races_white))]] - model[[(names(races_black))]]
+all_races$white_vs_black = cosineSimilarity(races, white_black_vector)
+
+#european vs asian vector
+european_asian_vector = model[[(names(races_european))]] - model[[(names(races_asian))]]
+all_races$european_vs_asian = cosineSimilarity(races, european_asian_vector)
+
+#hispanic vs asian vector
+hispanic_asian_vector = model[[(names(races_hispanic))]] - model[[(names(races_asian))]]
+all_races$hispanic_vs_asian = cosineSimilarity(races, hispanic_asian_vector)
+
+
+#black vs asian vector
+black_asian_vector = model[[(names (races_black))]] - model[[(names (races_asian))]]
+all_races$black_vs_asian = cosineSimilarity(races,black_asian_vector)
+
+#asian vs black vector
+asian_black_vector = model[[(names (races_asian))]] - model[[(names (races_black))]]
+all_races$asian_vs_black = cosineSimilarity(races,asian_black_vector)
+
+#white vs hispanic vector
+white_hispanic_vector = model[[(names(races_white))]] - model[[(names(races_hispanic))]]
+all_races$white_vs_hispanic = cosineSimilarity(races, white_hispanic_vector)
+
+#white vs jewish vector
+white_jewish_vector = model[[(names (races_jewish))]] - model[[(names (races_white))]]
+all_races$white_vs_jewish = cosineSimilarity(races, white_jewish_vector)
+
+#white vs christian vector
+white_christian_vector = model[[(names (races_christian))]] - model[[(names (races_white))]]
+all_races$white_vs_christian = cosineSimilarity(races, white_christian_vector)
+
+#jewish vs christian (outsider/insider?)
+white_jewish_vector = model[[(names(races_white))]] - model[[(names(races_jewish))]]
+all_races$white_vs_jewish = cosineSimilarity(races, white_jewish_vector)
+
+#insider vs outsider
+insider_outsider_vector = model[[names(insider_terms)]] - model[[(names(races_outsider))]]
+all_races$insider_vs_outsider = cosineSimilarity(races, insider_outsider_vector)
+```
+
+```{r plotting racial fields black/white and asian/european, echo=FALSE}
+
+library(ggplot2)
+
+
+ggplot(all_races,aes(x=european_vs_asian,y=white_vs_black,label=word)) + geom_text(size=2.5) +
+  scale_y_continuous("<----- Black ..............  White ------>",limits=c(-.45,.5)) +
+  scale_x_continuous("<----- Asian ..............  European ------>",limits=c(-.55,.45))
+
+ggsave("mjp_race_scales.jpg")
+```
+
