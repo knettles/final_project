@@ -54,8 +54,12 @@ model = read.vectors("C:/Users/Kim/Documents/Text Analysis for Historians/moml/m
 ```
 The collective list of racial terms for medical jurisprudence are:
 ```{r model for all races, include=FALSE}
+
 all_race_terms <- c("race", "races" , "racial" ,
-"ethnic" , "caucasian" , "esquimaux","australoid" ,  "australians", "negroid" , "mongolians" , "aboriginal","european" , "europeans" , "eskimo" , "mongolian" , "malays" , "mohammedans" , "chaldaic" , "mulattoes" , "negro" , "negress" , "japanese" , "african" , "italians" , "africans" , "jews", "tribes" , "hottentots" , "asiatics",   "mexican" , "chaco" , "hebrew" , "chinese" , "islanders" , "hindoos" , "germanic" , "scandinavian" , "arab" , "egyptian" , "persian" , "greeks" , "saxons", "indians", "anglo" , "canaanites" , "norweigan" , "peruvian" , "peruvians" , "oriental" , "georgian" , "scandinavian" , "creole", "jewish", "georgian" , "scandinavian", "roman", "romans" ,  "carthagenians", "swedes", "grecians")
+"ethnic" , "caucasian" , "esquimaux",  "australians",   "aboriginal","european" , "europeans" , "eskimo" ,  "malays" , "mulattoes" , "negro" , "negress" , "japanese" , "african" , "italians" , "italian" , "africans" , "jews", "tribes" , "hottentots" , "asiatics",   "mexican" , "chaco" , "hebrew" , "chinese" , "islanders" , "germanic" , "scandinavian" , "arab" , "egyptian" , "persian" , "greeks" , "saxons", "indians", "anglo" , "norweigan" , "peruvian" , "peruvians" , "oriental" , "georgian" ,  "creole", "jewish",  "roman", "romans" ,  "swedes", "grecians", "negroid")
+
+all_race_terms <-sort(all_race_terms, decreasing = FALSE)
+saveRDS(all_race_terms, "mjp_all_terms.RDS")
 
 some_races = model %>%
   nearest_to(model[[all_race_terms]],150) %>% names
@@ -75,7 +79,10 @@ list(all_race_terms)
 
 
 ```{r creating the Asian variable, include=FALSE}
-asian_terms <- c( "esquimaux","australoid" ,  "australians", "mongolians" , "aboriginal","eskimo" , "anthropoid" ,  "australians" , "mongolian" , "malays" , "mohammedans" , "chaldaic" , "japanese" , "jews", "tribes" , "asiatics", "hebrew" , "chinese" , "islanders" , "hindoos" , "indians", "oriental")
+asian_terms <- c( "esquimaux", "australians", "aboriginal","eskimo" , "malays" , "japanese" ,  "tribes" , "asiatics",  "chinese" , "islanders" ,  "indians", "oriental")
+
+asian_terms <-sort(asian_terms, decreasing = FALSE)
+saveRDS(asian_terms, "mjp_asian_terms.RDS")
 
 races_asian = nearest_to(model,model[[ asian_terms ]],150)
 
@@ -84,27 +91,41 @@ races_asian = nearest_to(model,model[[ asian_terms ]],150)
 
 ```{r creating afram variable, include=FALSE}
 
-black_terms <- c("negroid" , "mulattoes" , "breeds" ,  "negro" , "negress" , "negroid" ,"african" ,  "africans" , "hottentots" , "creole" , "mongolians" )
+black_terms <- c("mulattoes" , "breeds" ,  "negro" , "negress" , "african" ,  "africans" , "hottentots" , "creole" , "negorid" )
+
+black_terms <-sort(black_terms, decreasing = FALSE)
+saveRDS(black_terms, "mjp_black_terms.RDS")
 
 races_black = nearest_to(model,model[[black_terms]],150)
 
 ```
 
 ```{r creating white variable, include=FALSE}
-white_terms <- c("caucasian",  "germanic" , "scandinavian" , "saxons", "anglo")
+white_terms <- c("caucasian",  "saxons", "anglo")
+#removed "germanic", "scandinavian"
+white_terms <-sort(white_terms, decreasing = FALSE)
+saveRDS(white_terms, "mjp_white_terms.RDS")
 
 races_white = nearest_to(model,model[[white_terms]],150)
+races_white_sample = nearest_to(model,model[[white_terms]],15)
+saveRDS(races_white_sample, "mjp_races_white_nearest_to_sample.RDS")
 
 ```
 
 ```{r creating hispanic variable, include=FALSE}
 hispanic_terms <-c("mexican" , "aboriginal" , "chaco" , "peruvian" , "peruvians" , "indians" , "spanish")
 
+hispanic_terms <-sort(hispanic_terms, decreasing = FALSE)
+saveRDS(hispanic_terms, "mjp_hispanic_terms.RDS")
+
 races_hispanic = nearest_to(model,model[[hispanic_terms]],150)
 ```
 
 ```{r creating european variable, include=FALSE}
-european_terms<- c("european" , "europeans" , "italians" ,  "germanic" , "scandinavian" ,  "greeks" , "saxons",  "anglo" ,  "norweigan" , "georgian" , "scandinavian", "roman", "romans" ,  "carthagenians", "swedes", "grecians")
+european_terms<- c("european" , "europeans" , "italians" ,  "germanic" , "scandinavian" ,  "greeks" , "saxons",  "anglo" ,  "norweigan" , "georgian" ,  "roman", "romans" , "swedes", "grecians" , "italian")
+
+european_terms <-sort(european_terms, decreasing = FALSE)
+saveRDS(european_terms, "mjp_european_terms.RDS")
 
 races_european = nearest_to(model,model[[european_terms]],150)
 ```
@@ -134,8 +155,12 @@ list(white_terms)
 ```
 
 ```{r, creating jewish variable, include=FALSE}
-jewish_terms <- c("jews", "tribes" , "hebrew" ,"jewish", "chaldaic")
-races_jewish = nearest_to(model,model[[jewish_terms]],300)
+jewish_terms <- c("jews", "tribes" , "hebrew" ,"jewish")
+
+jewish_terms <-sort(jewish_terms, decreasing = FALSE)
+saveRDS(jewish_terms, "mjp_jewish_terms.RDS")
+
+races_jewish = nearest_to(model,model[[jewish_terms]],150)
 ```
 Jewish terms:
 ```{r, echo=FALSE}
@@ -147,7 +172,9 @@ list(jewish_terms)
 ```{r looking for the Irish}
 irish_terms <- c("irish"  )
 
-races_irish = nearest_to(model,model[[irish_terms]],150)
+races_irish = nearest_to(model,model[[irish_terms]],15)
+
+saveRDS(races_irish, "mjp_irish.RDS")
 
 head(races_irish, 20)
 
@@ -159,13 +186,13 @@ In a similar vein, Native Americans do not appear in the texts. Modeling of "ind
 
 ```{r Cosine Similarity Scores, echo=FALSE}
 #1. Create races model
-races = model[rownames(model) %in% some_races [1:75], ]
+races = model[rownames(model) %in% some_races [1:100], ]
 #2. African American Cosine Similarity Score
 black_score = races %>% cosineSimilarity(model[[names(races_black)]])
 #3. Asian Cosine Similarity Score
 asian_score = races %>% cosineSimilarity(model[[names(races_asian)]])
-#4. Caucasian Cosine Similarity Score
-caucasian_score = races %>% cosineSimilarity(model[[names(races_white)]])
+#4. White Cosine Similarity Score
+white_score = races %>% cosineSimilarity(model[[names(races_white)]])
 #5. Hispanic Cosine Similarity Score
 hispanic_score = races %>% cosineSimilarity(model[[names(races_hispanic)]])
 #6. European Cosine Similarity Score
@@ -188,39 +215,41 @@ all_races_score = races %>% cosineSimilarity(model[[names(races_all)]])
 ```{R Plotting Cosine Similarities, include=TRUE}
 
 #1. White vs Black
-png(filename="black_vs_white_cosineimilarities.png")
-plot(black_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to Black\n(x axis) and White (y axis).")
-text(black_score, caucasian_score, labels = rownames(races), cex=.7)
+jpeg(filename="black_vs_white_cosineimilarities.jpg")
+plot(black_score, white_score, type ='n', main="Top 100 words plotted by their similarity to Black\n(x axis) and White (y axis).")
+text(black_score, white_score, labels = rownames(races), cex=.7)
 abline(a=0, b=1)
 dev.off()
 
 
-#2.Asian vs Black 
-png(filename="asian_vs_black_cosineimilarities.png")
-plot(black_score, asian_score, type ='n', main="Top 150 words plotted by their similarity to AA\n(x axis) and Asians (y axis).")
-text(black_score, asian_score, labels = rownames(races), cex=.7)
+#2.Black vs Asian
+jpeg(filename="asian_vs_black_cosineimilarities.jpg")
+plot(asian_score, black_score, type ='n', main="Top 100 words plotted by their similarity to Blacks\n(x axis) and Asians (y axis).")
+text(asian_score, black_score, labels = rownames(races), cex=.7)
 abline(a=0, b=1)
 dev.off()
 
-#3. Caucasian vs Asian
-plot(asian_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to Asian\n(x axis) and Caucasians (y axis).")
-text(asian_score, caucasian_score, labels = rownames(races), cex=.7)
+#3. white vs Asian
+png(filename="asian_vs_white_cosineimilarities.png")
+plot(white_score, asian_score, type ='n', main="Top 100 words plotted by their similarity to White\n(x axis) and Asian (y axis) Taxonomies.")
+text(white_score, asian_score, labels = rownames(races), cex=.7)
+abline(a=0, b=1)
+dev.off()
+
+#4. white vs Jewish
+plot(jewish_score, white_score, type ='n', main="Top 100 words plotted by their similarity to Jewish\n(x axis) and whites (y axis).")
+text(jewish_score, white_score, labels = rownames(races), cex=.7)
 abline(a=0, b=1)
 
-#4. Caucasian vs Jewish
-plot(jewish_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to Jewish\n(x axis) and Caucasians (y axis).")
-text(jewish_score, caucasian_score, labels = rownames(races), cex=.7)
-abline(a=0, b=1)
-
-#5. All Races vs Caucasian
-plot(all_races_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to All Races\n(x axis) and Caucasians (y axis).")
-text(all_races_score, caucasian_score, labels = rownames(races), cex=.7)
+#5. All Races vs white
+plot(all_races_score, white_score, type ='n', main="Top 100 words plotted by their similarity to All Races\n(x axis) and whites (y axis).")
+text(all_races_score, white_score, labels = rownames(races), cex=.7)
 abline(a=0, b=1)
 
 
-#6. Caucasian vs European
-plot(european_score, caucasian_score, type ='n', main="Top 150 words plotted by their similarity to european\n(x axis) and Caucasians (y axis).")
-text(all_races_score, caucasian_score, labels = rownames(races), cex=.7)
+#6. white vs European
+plot(european_score, white_score, type ='n', main="Top 100 words plotted by their similarity to european\n(x axis) and whites (y axis).")
+text(all_races_score, white_score, labels = rownames(races), cex=.7)
 abline(a=0, b=1)
 
 
@@ -271,8 +300,11 @@ library(ggplot2)
 
 
 ggplot(all_races,aes(x=inside_vs_outside,y=white_vs_black,label=word)) + geom_text(size=2.5) +
-  scale_y_continuous("<----- Black ..............  White ------>",limits=c(-.5,.5)) +
-  scale_x_continuous("<----- Outside ..............  Inside ------>",limits=c(-.55,.45))
+  coord_equal()+ 
+  geom_jitter(width = 0.01, height = 0.02, size = 0.005, color = "lightblue")+
+  scale_y_continuous("<----- Inferior ..............  Superior ------>") +
+  scale_x_continuous("<----- Foreign ..............  Insider ------>") +
+  labs(title = "Racial Ordering in Medical Jurisprudence, 1800-1926: Top 100 Terms")
 
 ggsave("mjp_race_scales.jpg")
 ```
